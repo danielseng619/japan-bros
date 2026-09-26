@@ -13,7 +13,7 @@ export function createHandler(read = readSheets) {
     catch (error) {
       // Never return upstream errors, tokens, keys, workbook data, or identifiers.
       const configured = error.message !== 'SHEETS_NOT_CONFIGURED';
-      const known = ['SHEETS_NOT_CONFIGURED', 'SHEETS_AUTH', 'SHEETS_UNAVAILABLE', 'SHEET_SCHEMA', 'SHEET_EMPTY'];
+      const known = ['SHEETS_NOT_CONFIGURED', 'SHEETS_AUTH', 'SHEETS_AUTH_SIGNATURE', 'SHEETS_AUTH_ACCOUNT', 'SHEETS_UNAVAILABLE', 'SHEET_SCHEMA', 'SHEET_EMPTY'];
       const code = known.includes(error.message) ? error.message :
         ['ERR_OSSL_UNSUPPORTED', 'ERR_OSSL_PEM_NO_START_LINE', 'ERR_OSSL_ASN1_WRONG_TAG', 'ERR_OSSL_ASN1_TOO_LONG'].includes(error.code) ? 'CREDENTIAL_FORMAT' : 'CONNECTION_ERROR';
       return res.status(503).json({ code, error: configured ? 'The trip sheet is temporarily unavailable. Please retry.' : 'The private Google Sheets connection needs to be configured in Vercel.' });
