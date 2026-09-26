@@ -64,3 +64,12 @@ test('private Google reader uses read-only JWT, fresh reads and narrow columns',
   const a=parseTrip(await readSheets(env,request)),b=parseTrip(await readSheets(env,request));
   assert.equal(tokenCalls,1);assert.equal(reads,2);assert.notEqual(a.days[0].title,b.days[0].title);
 });
+
+test('normalizes copied PEM, quoted JSON and escaped line breaks without changing key bytes',async()=>{
+  const {generateKeyPairSync,createPrivateKey}=await import('node:crypto');
+  const {normalizePrivateKey}=await import('../lib/sheets.js');
+  const {privateKey}=generateKeyPairSync('rsa',{modulusLength:2048});
+  const pem=privateKey.export({type:'pkcs8',format:'pem'});
+  const samples=[pem,JSON.stringify(pem),JSON.stringify({private_key:pem}),pem.replace(/\n/g,'\\n'),pem.replace(/\n/g,'\\\\n'),'"'+pem.replace(/\n/g,'\\n')+'",'];
+  for(const sample of samples) assert.equal(createPrivateKey(normalizePrivateKey(sample)).export({type:'pkcs8',format:'pem'}),pem);
+});
